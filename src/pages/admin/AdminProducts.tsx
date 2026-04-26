@@ -8,6 +8,16 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Loader2, X, Upload } from "lucide-reac
 import { toast } from "sonner";
 import { formatEGP } from "@/lib/format";
 
+type Category = "accessories" | "headphones" | "laptops" | "mobiles" | "offers" | "smart_devices";
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: "mobiles", label: "موبايلات" },
+  { value: "laptops", label: "لابتوبات" },
+  { value: "headphones", label: "سماعات" },
+  { value: "accessories", label: "إكسسوارات" },
+  { value: "smart_devices", label: "أجهزة ذكية" },
+  { value: "offers", label: "عروض" },
+];
+
 type Product = {
   id: string;
   name: string;
@@ -17,7 +27,7 @@ type Product = {
   stock: number;
   discount: number | null;
   is_active: boolean;
-  category: string;
+  category: Category;
 };
 
 const empty = {
@@ -27,7 +37,7 @@ const empty = {
   image_url: "",
   stock: 10,
   discount: 0,
-  category: "electronics",
+  category: "accessories" as Category,
   is_active: true,
 };
 
@@ -55,12 +65,12 @@ const AdminProducts = () => {
       image_url: editing.image_url || null,
       stock: Number(editing.stock || 0),
       discount: Number(editing.discount || 0),
-      category: editing.category || "electronics",
+      category: (editing.category || "accessories") as Category,
       is_active: editing.is_active ?? true,
     };
     const res = editing.id
       ? await supabase.from("products").update(payload).eq("id", editing.id)
-      : await supabase.from("products").insert(payload as any);
+      : await supabase.from("products").insert(payload);
     if (res.error) return toast.error(res.error.message);
     toast.success("تم الحفظ");
     setOpen(false);
@@ -148,6 +158,16 @@ const AdminProducts = () => {
               <div><Label>المخزون</Label><Input type="number" value={editing.stock || 0} onChange={(e) => setEditing({ ...editing, stock: Number(e.target.value) })} /></div>
             </div>
             <div><Label>خصم %</Label><Input type="number" value={editing.discount || 0} onChange={(e) => setEditing({ ...editing, discount: Number(e.target.value) })} /></div>
+            <div>
+              <Label>التصنيف</Label>
+              <select
+                value={editing.category || "accessories"}
+                onChange={(e) => setEditing({ ...editing, category: e.target.value as Category })}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
             <div><Label>الوصف</Label><Textarea value={editing.description || ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} /></div>
             <div>
               <Label>الصورة</Label>
