@@ -75,6 +75,7 @@ const ProductPage = () => {
   const handleSubmit = async (d: CheckoutData) => {
     setSubmitting(true);
     try {
+      const grand = total + (d.delivery_price || 0);
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
@@ -83,7 +84,8 @@ const ProductPage = () => {
           governorate: d.governorate,
           address: d.address,
           notes: d.notes || null,
-          total_price: total,
+          total_price: grand,
+          delivery_price: d.delivery_price || 0,
         })
         .select()
         .single();
@@ -105,7 +107,9 @@ const ProductPage = () => {
         address: d.address,
         notes: d.notes,
         lines: [{ name: product.name, qty, price }],
-        total,
+        subtotal: total,
+        delivery: d.delivery_price || 0,
+        total: grand,
       });
       window.location.href = buildWhatsappLink(wa, msg);
     } catch (e: any) {
@@ -164,8 +168,8 @@ const ProductPage = () => {
 
         {showBuy && (
           <div className="mt-8 bg-gradient-card rounded-2xl p-5 border border-border/60 shadow-card animate-fade-up">
-            <h2 className="font-bold text-lg mb-4">إتمام الطلب — الإجمالي: <span className="text-primary">{formatEGP(total)}</span></h2>
-            <CheckoutForm onSubmit={handleSubmit} submitting={submitting} />
+            <h2 className="font-bold text-lg mb-4">إتمام الطلب</h2>
+            <CheckoutForm onSubmit={handleSubmit} submitting={submitting} subtotal={total} />
           </div>
         )}
       </main>

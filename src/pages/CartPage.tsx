@@ -18,6 +18,7 @@ const CartPage = () => {
   const handleSubmit = async (d: CheckoutData) => {
     setSubmitting(true);
     try {
+      const grand = total + (d.delivery_price || 0);
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
@@ -26,7 +27,8 @@ const CartPage = () => {
           governorate: d.governorate,
           address: d.address,
           notes: d.notes || null,
-          total_price: total,
+          total_price: grand,
+          delivery_price: d.delivery_price || 0,
         })
         .select()
         .single();
@@ -50,7 +52,9 @@ const CartPage = () => {
         address: d.address,
         notes: d.notes,
         lines: items.map((i) => ({ name: i.name, qty: i.quantity, price: i.price })),
-        total,
+        subtotal: total,
+        delivery: d.delivery_price || 0,
+        total: grand,
       });
       clear();
       window.location.href = buildWhatsappLink(wa, msg);
@@ -106,15 +110,16 @@ const CartPage = () => {
 
         <div className="bg-gradient-card rounded-2xl p-4 border border-border/60 shadow-card sticky bottom-3">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-muted-foreground">الإجمالي</span>
+            <span className="text-muted-foreground">إجمالي المنتجات</span>
             <span className="font-display font-bold text-2xl text-gradient-primary">{formatEGP(total)}</span>
           </div>
+          <p className="text-xs text-muted-foreground mb-3">+ سعر التوصيل حسب المحافظة</p>
           {!checkout ? (
             <Button onClick={() => setCheckout(true)} size="lg" className="w-full bg-gradient-primary border-0 shadow-glow">
               متابعة الدفع
             </Button>
           ) : (
-            <CheckoutForm onSubmit={handleSubmit} submitting={submitting} />
+            <CheckoutForm onSubmit={handleSubmit} submitting={submitting} subtotal={total} />
           )}
         </div>
       </main>
