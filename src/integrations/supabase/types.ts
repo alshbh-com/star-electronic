@@ -416,41 +416,21 @@ export type Database = {
       }
     }
     Views: {
-      settings_public: {
-        Row: {
-          id: string | null
-          logo_url: string | null
-          platform_name: string | null
-          primary_color: string | null
-          secondary_color: string | null
-          tagline: string | null
-          updated_at: string | null
-          whatsapp_number: string | null
-        }
-        Insert: {
-          id?: string | null
-          logo_url?: string | null
-          platform_name?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          tagline?: string | null
-          updated_at?: string | null
-          whatsapp_number?: string | null
-        }
-        Update: {
-          id?: string | null
-          logo_url?: string | null
-          platform_name?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          tagline?: string | null
-          updated_at?: string | null
-          whatsapp_number?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_public_settings: {
+        Args: never
+        Returns: {
+          id: string
+          logo_url: string
+          platform_name: string
+          primary_color: string
+          secondary_color: string
+          tagline: string
+          whatsapp_number: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
