@@ -21,10 +21,12 @@ export function buildOrderMessage(opts: {
   governorate: string;
   address: string;
   lines: OrderLine[];
+  subtotal: number;
+  delivery: number;
   total: number;
   notes?: string;
 }) {
-  const { platform = "Star Electronics", customer, phone, governorate, address, lines, total, notes } = opts;
+  const { platform = "Star Electronics", customer, phone, governorate, address, lines, subtotal, delivery, total, notes } = opts;
   const itemsText = lines
     .map((l, i) => `${i + 1}- ${l.name} × ${l.qty} = ${l.price * l.qty} ج.م`)
     .join("\n");
@@ -38,5 +40,7 @@ export function buildOrderMessage(opts: {
 *المنتجات:*
 ${itemsText}
 
+💵 المنتجات: ${subtotal} ج.م
+🚚 التوصيل: ${delivery} ج.م
 💰 *الإجمالي: ${total} ج.م*${notes ? `\n\n📝 ملاحظات: ${notes}` : ""}`;
 }

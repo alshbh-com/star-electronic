@@ -12,40 +12,51 @@ export type CheckoutData = {
   governorate: string;
   address: string;
   notes?: string;
+  delivery_price: number;
 };
 
 export const CheckoutForm = ({
   onSubmit,
   submitting,
   buttonLabel = "تأكيد الطلب عبر واتساب",
+  subtotal,
 }: {
   onSubmit: (d: CheckoutData) => void;
   submitting?: boolean;
   buttonLabel?: string;
+  subtotal: number;
 }) => {
-  const [governorates, setGovernorates] = useState<{ id: string; name: string }[]>([]);
+  const [governorates, setGovernorates] = useState<{ id: string; name: string; delivery_price: number }[]>([]);
   const [data, setData] = useState<CheckoutData>({
     customer_name: "",
     phone: "",
     governorate: "",
     address: "",
     notes: "",
+    delivery_price: 0,
   });
 
   useEffect(() => {
     supabase
       .from("governorates")
-      .select("id, name")
+      .select("id, name, delivery_price")
       .eq("is_active", true)
       .order("sort_order")
-      .then(({ data }) => setGovernorates(data || []));
+      .then(({ data }) => setGovernorates((data as any) || []));
   }, []);
+
+  const handleGovChange = (name: string) => {
+    const g = governorates.find((x) => x.name === name);
+    setData({ ...data, governorate: name, delivery_price: g ? Number(g.delivery_price) : 0 });
+  };
 
   const handle = (e: React.FormEvent) => {
     e.preventDefault();
     if (!data.customer_name || !data.phone || !data.governorate || !data.address) return;
     onSubmit(data);
   };
+
+  const grandTotal = subtotal + (data.delivery_price || 0);
 
   return (
     <form onSubmit={handle} className="space-y-4">
@@ -77,13 +88,13 @@ export const CheckoutForm = ({
           id="gov"
           required
           value={data.governorate}
-          onChange={(e) => setData({ ...data, governorate: e.target.value })}
+          onChange={(e) => handleGovChange(e.target.value)}
           className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
           <option value="">اختر المحافظة</option>
           {governorates.map((g) => (
             <option key={g.id} value={g.name}>
-              {g.name}
+              {g.name}{g.delivery_price > 0 ? ` — توصيل ${g.delivery_price} ج.م` : ""}
             </option>
           ))}
         </select>
@@ -108,6 +119,13 @@ export const CheckoutForm = ({
           rows={2}
         />
       </div>
+      {data.governorate && (
+        <div className="bg-secondary/40 rounded-xl p-3 space-y-1 text-sm">
+          <div className="flex justify-between"><span className="text-muted-foreground">المنتجات</span><span>{subtotal} ج.م</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">التوصيل</span><span>{data.delivery_price} ج.م</span></div>
+          <div className="flex justify-between font-bold pt-1 border-t border-border/60"><span>الإجمالي</span><span className="text-primary">{grandTotal} ج.م</span></div>
+        </div>
+      )}
       <Button
         type="submit"
         disabled={submitting}
