@@ -3,10 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 const FALLBACK_NUMBER = "01278006248";
 
 export async function getWhatsappNumber(): Promise<string> {
-  // settings table SELECT is admin-only; we use a public RPC fallback approach:
-  // try anon read — if blocked, return fallback.
-  const { data } = await supabase.from("settings").select("whatsapp_number").maybeSingle();
-  return data?.whatsapp_number || FALLBACK_NUMBER;
+  const { data } = await supabase.rpc("get_public_settings");
+  return (data?.[0]?.whatsapp_number as string) || FALLBACK_NUMBER;
 }
 
 export function buildWhatsappLink(phone: string, message: string) {
