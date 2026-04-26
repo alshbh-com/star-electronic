@@ -22,14 +22,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data: settings } = await supabase
-      .from("settings")
-      .select("admin_password")
-      .limit(1)
-      .maybeSingle();
-
-    const expected = settings?.admin_password || "01278006248";
-    if (password !== expected) {
+    // Securely verify password via SECURITY DEFINER RPC (bcrypt hash compare)
+    const { data: ok, error: verErr } = await supabase.rpc("verify_admin_password", {
+      _password: password,
+    });
+    if (verErr) throw verErr;
+    if (!ok) {
       return new Response(JSON.stringify({ error: "كلمة المرور غير صحيحة" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
