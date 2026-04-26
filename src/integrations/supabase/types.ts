@@ -46,6 +46,33 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           code: string
@@ -121,6 +148,7 @@ export type Database = {
       governorates: {
         Row: {
           created_at: string
+          delivery_price: number
           id: string
           is_active: boolean
           name: string
@@ -128,6 +156,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          delivery_price?: number
           id?: string
           is_active?: boolean
           name: string
@@ -135,6 +164,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          delivery_price?: number
           id?: string
           is_active?: boolean
           name?: string
@@ -193,6 +223,7 @@ export type Database = {
           coupon_code: string | null
           created_at: string
           customer_name: string
+          delivery_price: number
           discount_amount: number | null
           governorate: string | null
           id: string
@@ -209,6 +240,7 @@ export type Database = {
           coupon_code?: string | null
           created_at?: string
           customer_name: string
+          delivery_price?: number
           discount_amount?: number | null
           governorate?: string | null
           id?: string
@@ -225,6 +257,7 @@ export type Database = {
           coupon_code?: string | null
           created_at?: string
           customer_name?: string
+          delivery_price?: number
           discount_amount?: number | null
           governorate?: string | null
           id?: string
@@ -240,7 +273,7 @@ export type Database = {
       }
       products: {
         Row: {
-          category: Database["public"]["Enums"]["product_category"]
+          category: string
           created_at: string
           description: string | null
           discount: number | null
@@ -255,7 +288,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          category: Database["public"]["Enums"]["product_category"]
+          category?: string
           created_at?: string
           description?: string | null
           discount?: number | null
@@ -270,7 +303,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category?: Database["public"]["Enums"]["product_category"]
+          category?: string
           created_at?: string
           description?: string | null
           discount?: number | null
