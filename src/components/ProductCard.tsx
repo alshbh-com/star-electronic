@@ -1,10 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/context/CartContext";
 import { formatEGP, finalPrice } from "@/lib/format";
-import { toast } from "sonner";
 
 export type Product = {
   id: string;
@@ -16,23 +12,8 @@ export type Product = {
 };
 
 export const ProductCard = ({ p, index = 0 }: { p: Product; index?: number }) => {
-  const { add } = useCart();
-  const navigate = useNavigate();
   const price = finalPrice(p.price, p.discount);
   const hasDiscount = p.discount && p.discount > 0;
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    add({ id: p.id, name: p.name, price, image_url: p.image_url });
-    toast.success("تمت الإضافة للسلة");
-  };
-
-  const handleBuy = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(`/product/${p.id}?buy=1`);
-  };
 
   return (
     <motion.div
@@ -75,27 +56,6 @@ export const ProductCard = ({ p, index = 0 }: { p: Product; index?: number }) =>
             {hasDiscount ? (
               <span className="text-xs text-muted-foreground line-through">{formatEGP(p.price)}</span>
             ) : null}
-          </div>
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleAdd}
-              disabled={p.stock <= 0}
-              className="border-border/60 hover:border-primary/60 hover:bg-primary/10"
-            >
-              <ShoppingCart className="h-4 w-4 ml-1" />
-              السلة
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleBuy}
-              disabled={p.stock <= 0}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 border-0"
-            >
-              <Zap className="h-4 w-4 ml-1" />
-              اشتري
-            </Button>
           </div>
         </div>
       </Link>
