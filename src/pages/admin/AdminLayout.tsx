@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, Package, ShoppingBag, MapPin, Settings as SettingsIcon, Loader2, Home } from "lucide-react";
+import { LogOut, Package, ShoppingBag, MapPin, Settings as SettingsIcon, Loader2, Home, Layers } from "lucide-react";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -58,6 +58,9 @@ const AdminLayout = () => {
         <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
           <NavLink to="/admin" end className={({ isActive }) => `${link} ${isActive ? active : ""}`}>
             <Package className="h-4 w-4" /> المنتجات
+          </NavLink>
+          <NavLink to="/admin/categories" className={({ isActive }) => `${link} ${isActive ? active : ""}`}>
+            <Layers className="h-4 w-4" /> الأقسام
           </NavLink>
           <NavLink to="/admin/orders" className={({ isActive }) => `${link} ${isActive ? active : ""}`}>
             <ShoppingBag className="h-4 w-4" /> الطلبات

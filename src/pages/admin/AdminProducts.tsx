@@ -8,16 +8,6 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Loader2, X, Upload } from "lucide-reac
 import { toast } from "sonner";
 import { formatEGP } from "@/lib/format";
 
-type Category = "accessories" | "headphones" | "laptops" | "mobiles" | "offers" | "smart_devices";
-const CATEGORIES: { value: Category; label: string }[] = [
-  { value: "mobiles", label: "موبايلات" },
-  { value: "laptops", label: "لابتوبات" },
-  { value: "headphones", label: "سماعات" },
-  { value: "accessories", label: "إكسسوارات" },
-  { value: "smart_devices", label: "أجهزة ذكية" },
-  { value: "offers", label: "عروض" },
-];
-
 type Product = {
   id: string;
   name: string;
@@ -27,7 +17,7 @@ type Product = {
   stock: number;
   discount: number | null;
   is_active: boolean;
-  category: Category;
+  category: string;
 };
 
 const empty = {
@@ -37,12 +27,13 @@ const empty = {
   image_url: "",
   stock: 10,
   discount: 0,
-  category: "accessories" as Category,
+  category: "accessories",
   is_active: true,
 };
 
 const AdminProducts = () => {
   const [items, setItems] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
@@ -50,22 +41,26 @@ const AdminProducts = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-    setItems((data as Product[]) || []);
+    const [{ data: p }, { data: c }] = await Promise.all([
+      supabase.from("products").select("*").order("created_at", { ascending: false }),
+      supabase.from("categories").select("slug, name").eq("is_active", true).order("sort_order"),
+    ]);
+    setItems((p as Product[]) || []);
+    setCategories((c as any) || []);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
 
   const save = async () => {
     if (!editing?.name || !editing.price) return toast.error("اسم وسعر مطلوبين");
-    const payload = {
+    const payload: any = {
       name: editing.name,
       price: Number(editing.price),
       description: editing.description || null,
       image_url: editing.image_url || null,
       stock: Number(editing.stock || 0),
       discount: Number(editing.discount || 0),
-      category: (editing.category || "accessories") as Category,
+      category: editing.category || "accessories",
       is_active: editing.is_active ?? true,
     };
     const res = editing.id
@@ -162,10 +157,10 @@ const AdminProducts = () => {
               <Label>التصنيف</Label>
               <select
                 value={editing.category || "accessories"}
-                onChange={(e) => setEditing({ ...editing, category: e.target.value as Category })}
+                onChange={(e) => setEditing({ ...editing, category: e.target.value })}
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
-                {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                {categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
               </select>
             </div>
             <div><Label>الوصف</Label><Textarea value={editing.description || ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} /></div>

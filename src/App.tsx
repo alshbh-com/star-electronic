@@ -11,6 +11,7 @@ import CartPage from "./pages/CartPage.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminLayout from "./pages/admin/AdminLayout.tsx";
 import AdminProducts from "./pages/admin/AdminProducts.tsx";
+import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminOrders from "./pages/admin/AdminOrders.tsx";
 import AdminGovernorates from "./pages/admin/AdminGovernorates.tsx";
 import AdminSettings from "./pages/admin/AdminSettings.tsx";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminProducts />} />
+              <Route path="categories" element={<AdminCategories />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="governorates" element={<AdminGovernorates />} />
               <Route path="settings" element={<AdminSettings />} />
